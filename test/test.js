@@ -3,6 +3,13 @@ const fs          = require('fs');
 const thumbnailer = require('../lib/thumbnailer');
 const sizeOf      = require('image-size');
 const promisify   = require('bluebird').Promise.promisify;
+const AWS         = require('aws-sdk');
+const config      = require('../config');
+AWS.config.update({
+  accessKeyId: config.accessKey,
+  secretAccessKey: config.secretKey
+})
+const s3 = new AWS.S3();
 
 describe('thumbnailer', function() {
   it("rejects when file is missing", function () {
@@ -66,6 +73,17 @@ describe('thumbnailer', function() {
       expect(dimensions.width).toEqual(640, `Image width of ${dimensions.width} is incorrect`);
       expect(dimensions.height).toEqual(640, `Image height of ${dimensions.height} is incorrect`);
       fs.unlinkSync(path);
+    })
+  });
+
+  it("allows uploading to s3", function () {
+    this.timeout(20000);
+    return thumbnailer.process('https://s3-us-west-2.amazonaws.com/giggles-production-submissions/a1c043a0-b990-11e6-a32f-9356c83e3bd9.jpg').then(function(stream) {
+      var params = {Bucket: 'image.superseriouscompany.com', Key: 'cool.png', Body: stream, ACL: 'public-read', ContentType: 'image/png'}
+
+      return promisify(s3.upload, {context: s3})(params)
+    }).then(function(data) {
+      console.log(data.Location);
     })
   });
 })
