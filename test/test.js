@@ -49,6 +49,25 @@ describe('thumbnailer', function() {
       fs.unlinkSync(path);
     })
   });
+
+  it("works on a url", function () {
+    this.timeout(10000);
+
+    const path = './remote.png';
+    return thumbnailer.process('https://s3-us-west-2.amazonaws.com/giggles-production-submissions/a1c043a0-b990-11e6-a32f-9356c83e3bd9.jpg').then(function(stream) {
+      expect(stream).toExist('No path returned from thumbnailer');
+      const write = fs.createWriteStream(path);
+      const promise = promisify(write.on, {context: write})('close');
+      stream.pipe(write);
+      return promise;
+    }).then(function() {
+      expect(fs.existsSync(path)).toExist(`File not created at: ${path}`);
+      const dimensions = sizeOf(path);
+      expect(dimensions.width).toEqual(640, `Image width of ${dimensions.width} is incorrect`);
+      expect(dimensions.height).toEqual(640, `Image height of ${dimensions.height} is incorrect`);
+      fs.unlinkSync(path);
+    })
+  });
 })
 
 function shouldFail(result) {
