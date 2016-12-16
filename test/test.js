@@ -10,8 +10,18 @@ describe('thumbnailer', function() {
     })
   });
 
-  it("works", function () {
+  it("works on a tall jpg", function () {
     return thumbnailer.process(__dirname + '/fixtures/tall.jpg').then(function(path) {
+      expect(path).toExist('No path returned from thumbnailer');
+      expect(fs.existsSync(path)).toExist(`File not found at: ${path}`);
+      const dimensions = sizeOf(path);
+      expect(dimensions.width).toEqual(640, `Image width of ${dimensions.width} is incorrect`);
+      expect(dimensions.height).toEqual(640, `Image height of ${dimensions.height} is incorrect`);
+    })
+  });
+
+  it("works on a wide png", function () {
+    return thumbnailer.process(__dirname + '/fixtures/wide.png').then(function(path) {
       expect(path).toExist('No path returned from thumbnailer');
       expect(fs.existsSync(path)).toExist(`File not found at: ${path}`);
       const dimensions = sizeOf(path);
