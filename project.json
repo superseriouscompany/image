@@ -1,0 +1,8 @@
+{
+  "name": "image",
+  "description": "Image Service",
+  "memory": 128,
+  "timeout": 5,
+  "role": "arn:aws:iam::958190947822:role/image_lambda_function",
+  "environment": {}
+}

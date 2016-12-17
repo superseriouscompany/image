@@ -1,6 +1,6 @@
 const expect      = require('expect');
 const fs          = require('fs');
-const thumbnailer = require('../lib/thumbnailer');
+const thumbnailer = require('../functions/hello/thumbnailer');
 const sizeOf      = require('image-size');
 const promisify   = require('bluebird').Promise.promisify;
 const AWS         = require('aws-sdk');
@@ -83,7 +83,7 @@ describe('thumbnailer', function() {
 
       return promisify(s3.upload, {context: s3})(params)
     }).then(function(data) {
-      console.log(data.Location);
+      expect(data.Location).toExist();
     })
   });
 })
